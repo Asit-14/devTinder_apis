@@ -1,0 +1,28 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "MY application",
+  "keywords": [
+    "nodejs",
+    "javascript"
+  ],
+  "homepage": "https://github.com/Asit-14/devTinder#readme",
+  "bugs": {
+    "url": "https://github.com/Asit-14/devTinder/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Asit-14/devTinder.git"
+  },
+  "license": "MIT",
+  "author": "Asit kumar",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
