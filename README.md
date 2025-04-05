@@ -11,3 +11,10 @@
 - What are Dependencies 
 - What  is  the  use  of  "-g" while  npm  install
 - Diffrence  between  caret and  tilde (^ vs ~)
+- Initialize  git 
+- gitignore 
+- CCreate  a  remote  repo on github
+- push all  code  on  remote  origin 
+- play with routes  and  extention ex .  /hello , /, hello/2
+- Order  of the route  metter  of a  lot
+-   
