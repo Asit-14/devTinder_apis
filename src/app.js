@@ -6,14 +6,9 @@ const app = express()
 // Middleware to parse JSON request bodies
 app.use(express.json())
 
+// POST: Signup route for adding a new user
 app.post('/signup', async (req, res) => {
-  // creating a new instance of the user model
-  const user = new User({
-    firstName: 'Asit',
-    lastName: 'Kumar', // corrected casing
-    email: 'asitshakya789@gmail.com',
-    password: 'iloveyou',
-  })
+  const user = new User(req.body)
 
   try {
     await user.save()
@@ -23,6 +18,70 @@ app.post('/signup', async (req, res) => {
   }
 })
 
+// GET: API to find the user by email
+app.get('/user', async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.query.email })
+    if (!user) {
+      return res.status(404).send('User not found')
+    } else {
+      res.send(user)
+    }
+  } catch (err) {
+    res.status(500).send('Something went wrong: ' + err.message)
+  }
+})
+
+// GET: Feed API for getting all users from the database
+app.get('/feed', async (req, res) => {
+  try {
+    const users = await User.find()
+    res.send(users)
+  } catch (err) {
+    res.status(500).send('Error fetching users: ' + err.message)
+  }
+})
+
+// api for deleting a user by id
+app.delete('/user', async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.params.id)
+    if (!deletedUser) {
+      return res.status(404).send('User not found')
+    }
+    res.send('User deleted successfully')
+  } catch (err) {
+    res.status(500).send('Error deleting user: ' + err.message)
+  }
+})
+
+
+// api for updating a user by id
+app.patch('/user', async (req, res) => {
+  const { userId, ...updates } = req.body
+
+  if (!userId) {
+    return res.status(400).send('User ID is required')
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+      new: true,
+
+    })
+    if (!updatedUser) {
+      return res.status(404).send('User not found')
+    }
+    res.status(200).send(updatedUser)
+  } catch (err) {
+    res.status(500).send('Error updating user: ' + err.message)
+  }
+})
+
+
+
+
+// Connect to DB and start server
 connectDB()
   .then(() => {
     console.log('MongoDB Connected')
