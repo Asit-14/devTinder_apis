@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const validator = require('validator') // Use 'validator' package, not 'email-validator'
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,12 +18,24 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
       required: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error('Invalid email format')
+        }
+      },
     },
     password: {
       type: String,
       required: true,
       minlength: 8,
       maxlength: 15,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error(
+            'Password must include uppercase, lowercase, number, and symbol',
+          )
+        }
+      },
     },
     age: {
       type: Number,
@@ -31,7 +44,6 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-
       validate(value) {
         const allowedGenders = ['male', 'female', 'other']
         if (!allowedGenders.includes(value.toLowerCase())) {
@@ -46,6 +58,11 @@ const userSchema = new mongoose.Schema(
     photo: {
       type: String,
       default: './src/Public/User.jpeg',
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error('Invalid photo URL format')
+        }
+      },
     },
     skills: {
       type: [String],

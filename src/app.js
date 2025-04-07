@@ -14,7 +14,7 @@ app.post('/signup', async (req, res) => {
     await user.save()
     res.status(201).send('User added successfully')
   } catch (err) {
-    res.status(500).send('Error saving the user: ' + err.message)
+    res.status(400).send('Error saving the user: ' + err.message)
   }
 })
 
@@ -24,9 +24,8 @@ app.get('/user', async (req, res) => {
     const user = await User.findOne({ email: req.query.email })
     if (!user) {
       return res.status(404).send('User not found')
-    } else {
-      res.send(user)
     }
+    res.send(user)
   } catch (err) {
     res.status(500).send('Something went wrong: ' + err.message)
   }
@@ -42,43 +41,65 @@ app.get('/feed', async (req, res) => {
   }
 })
 
-// api for deleting a user by id
-app.delete('/user', async (req, res) => {
+// DELETE: API to delete a user by ID
+app.delete('/user/:id', async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id)
     if (!deletedUser) {
       return res.status(404).send('User not found')
     }
-    res.send('User deleted successfully')
+    res.status(200).send('User deleted successfully')
   } catch (err) {
     res.status(500).send('Error deleting user: ' + err.message)
   }
 })
 
+// PATCH: API to update a user by ID
+app.patch('/user/:userId', async (req, res) => {
+  const updates = req.body
+  const allowedUpdates = [
+    'firstName',
+    'lastName',
+    'age',
+    'gender',
+    'about',
+    'photo',
+    'skills',
+  ]
 
-// api for updating a user by id
-app.patch('/user', async (req, res) => {
-  const { userId, ...updates } = req.body
+  // Check if all updates are allowed
+  const isUpdateAllowed = Object.keys(updates).every((key) =>
+    allowedUpdates.includes(key)
+  )
 
-  if (!userId) {
-    return res.status(400).send('User ID is required')
+  if (!isUpdateAllowed) {
+    return res.status(400).send('Invalid update fields')
+  }
+
+  // Custom check for skills array length
+  if (updates.skills && Array.isArray(updates.skills) && updates.skills.length > 10) {
+    return res.status(400).send('Skills should be less than or equal to 10')
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
-      new: true,
-    })
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.userId,
+      updates,
+      {
+        new: true,
+        runValidators: true, // ensures Mongoose schema validations are applied
+      }
+    )
+
     if (!updatedUser) {
       return res.status(404).send('User not found')
     }
+
     res.status(200).send(updatedUser)
   } catch (err) {
-    res.status(500).send('Error updating user: ' + err.message)
+    res.status(400).send('Error updating user: ' + err.message)
   }
 })
-
-
-
 
 // Connect to DB and start server
 connectDB()
