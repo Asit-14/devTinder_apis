@@ -67,7 +67,6 @@ app.patch('/user', async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(userId, updates, {
       new: true,
-
     })
     if (!updatedUser) {
       return res.status(404).send('User not found')
