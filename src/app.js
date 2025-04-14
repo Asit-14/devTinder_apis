@@ -3,22 +3,22 @@ const connectDB = require('./config/database')
 const User = require('./models/user')
 const bcrypt = require('bcrypt')
 const { validateSignUpData } = require('./utils/validation')
+const cookieParser = require('cookie-parser')
+const jwt = require('jsonwebtoken')
+const { userAuth } = require('../src/middlewares/auth')
 
 const app = express()
 
 // ✅ Middleware
 app.use(express.json())
+app.use(cookieParser())
+app.auth
 
 // POST: User signup
 app.post('/signup', async (req, res) => {
   try {
     validateSignUpData(req) // You can expand this function to validate more fields
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-    } = req.body
+    const { firstName, lastName, email, password } = req.body
 
     // Check if email already exists
     const existingUser = await User.findOne({ email })
@@ -42,99 +42,56 @@ app.post('/signup', async (req, res) => {
   }
 })
 
-
-// POST: User login 
+// POST: User login
 app.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email:email })
+    const { email, password } = req.body; // ✅ Correct variable
 
-    if (!user) return res.status(404).send('User not found')
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).send('User not found');
 
-    const passwordMatch = await bcrypt.compare(password, user.password)
-    if (!passwordMatch) return res.status(401).send('Invalid credentials')
+    // ✅ Use the 'password' variable from req.body
+    const passwordMatch = await user.validatePassword(password);
+    if (!passwordMatch) return res.status(401).send('Invalid credentials');
 
-    res.send('Login successful')
+    const token = await user.getJWT(); // Your custom method to generate JWT
+
+    // ✅ Optionally set cookie
+    res.cookie('token', token, {
+      expires: new Date(Date.now() + 8 * 3600000), // 8 hours
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+    });
+
+    res.status(200).send({ token });
   } catch (err) {
-    res.status(500).send('Something went wrong: ' + err.message)
+    res.status(400).send('Error logging in: ' + err.message);
   }
 });
 
 
-
-// GET: Find user by email
-app.get('/user', async (req, res) => {
+// GET /profile route
+app.get('/profile', userAuth, async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.query.email })
-    if (!user) return res.status(404).send('User not found')
+    const user = req.user
+    // Assuming User model is properly imported
+    if (!user) {
+      throw new Error('ERROR : ' + err.message)
+    }
+
     res.send(user)
   } catch (err) {
-    res.status(500).send('Something went wrong: ' + err.message)
+    res.status(401).send('ERROR : ' + err.message)
   }
 })
 
-// GET: Fetch all users
-app.get('/feed', async (req, res) => {
-  try {
-    const users = await User.find()
-    res.send(users)
-  } catch (err) {
-    res.status(500).send('Error fetching users: ' + err.message)
-  }
-})
+// POST: Send connection request
+app.post('/sendConnectionRequest', userAuth, async (req, res) => {
+  const user = req.user
 
-// DELETE: Delete user by ID
-app.delete('/user/:id', async (req, res) => {
-  try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id)
-    if (!deletedUser) return res.status(404).send('User not found')
-    res.status(200).send('User deleted successfully')
-  } catch (err) {
-    res.status(500).send('Error deleting user: ' + err.message)
-  }
-})
-
-// PATCH: Update user by ID
-app.patch('/user/:userId', async (req, res) => {
-  const updates = req.body
-  const allowedUpdates = [
-    'firstName',
-    'lastName',
-    'age',
-    'gender',
-    'about',
-    'photo',
-    'skills',
-  ]
-
-  const isUpdateAllowed = Object.keys(updates).every((key) =>
-    allowedUpdates.includes(key),
-  )
-
-  if (!isUpdateAllowed) {
-    return res.status(400).send('Invalid update fields')
-  }
-
-  if (
-    updates.skills &&
-    Array.isArray(updates.skills) &&
-    updates.skills.length > 10
-  ) {
-    return res.status(400).send('Skills should be less than or equal to 10')
-  }
-
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.userId,
-      updates,
-      { new: true, runValidators: true },
-    )
-
-    if (!updatedUser) return res.status(404).send('User not found')
-    res.status(200).send(updatedUser)
-  } catch (err) {
-    res.status(400).send('Error updating user: ' + err.message)
-  }
+  console.log('Connection Request Sent!')
+  // Add your logic for sending a connection request here
+  res.send(user.firstName + 'sent the  connection request')
 })
 
 // Connect to DB and start the server

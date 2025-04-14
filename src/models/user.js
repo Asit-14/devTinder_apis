@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
-const validator = require('validator') // Use 'validator' package
+const validator = require('validator')
+const bcrypt = require('bcrypt') // Changed from bcryptjs to bcrypt
+const jwt = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema(
   {
@@ -53,11 +55,7 @@ const userSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
-      default: './src/Public/User.jpeg',
-      // validate: {
-      //   validator: (value) => validator.isURL(value),
-      //   message: 'Invalid photo URL format',
-      // },
+      default: '/public/User.jpeg', // More standard public path
     },
     skills: {
       type: [String],
@@ -67,6 +65,28 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 )
+
+// Method to generate JWT
+userSchema.methods.getJWT = async function () {
+  const user = this
+  const token = jwt.sign(
+    { _id: user._id },
+    process.env.JWT_SECRET || 'techasiti', // Configurable secret
+    {
+      expiresIn: '7d',
+    },
+  )
+  return token
+}
+
+// Method to validate password
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    this.password,
+  )
+  return isPasswordValid
+}
 
 const User = mongoose.model('User', userSchema)
 module.exports = User
