@@ -33,7 +33,7 @@ authRouter.post('/signup', async (req, res) => {
   } catch (err) {
     res.status(400).send('Error saving the user: ' + err.message)
   }
-})
+});
 
 // POST: User login
 authRouter.post('/login', async (req, res) => {
@@ -55,11 +55,24 @@ authRouter.post('/login', async (req, res) => {
       expires: new Date(Date.now() + 8 * 3600000),
     })
 
-    res.status(200).send({ token })
+    res.status(200).send({ token })// login succesfully
   } catch (err) {
     res.status(400).send('Error logging in: ' + err.message)
   }
-})
+});
+
+// POST: User Logout
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0), // Alternatively: new Date(Date.now()) is also okay
+    sameSite: "Strict", // Optional, but good for security
+    secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+  });
+  res.status(200).send("Logged out successfully");
+});
+
+
 
 
 module.exports = authRouter;

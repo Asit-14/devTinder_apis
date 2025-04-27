@@ -1,10 +1,11 @@
 const express = require("express");
 const profileRouter = express.Router();
-const { userAuth } = require('../middlewares/auth') // ✅ Fix path
+const { userAuth } = require('../middlewares/auth'); // ✅ Fix path
+const { validate } = require("../models/user");
 
 
 // GET: Profile (Protected route)
-profileRouter.get('/profile', userAuth, async (req, res) => {
+profileRouter.get('/profile/view', userAuth, async (req, res) => {
   try {
     const user = req.user
     if (!user) {
@@ -17,5 +18,18 @@ profileRouter.get('/profile', userAuth, async (req, res) => {
   }
 })
 
+
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+    try {
+        if (!validateEditProfileData(req)) {
+            throw new Error("Invalid Edit request");
+        }
+
+        const loggedInUser = req.user;
+        console.log(loggedInUser);
+    } catch (err) {
+        res.send(400).send("ERROR :" + err.message);
+    }
+}) 
 
 module.exports = profileRouter;
