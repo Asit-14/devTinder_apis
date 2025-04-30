@@ -4,17 +4,11 @@ const User = require('../models/user')
 const userAuth = async (req, res, next) => {
   try {
     const { token } = req.cookies
-
-    if (!token) {
-      return res.status(401).json({ error: 'Token not found' })
-    }
+    if (!token) return res.status(401).json({ error: 'Token not found' })
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
     const user = await User.findById(decoded._id)
-    if (!user) {
-      return res.status(401).json({ error: 'User not found' })
-    }
+    if (!user) return res.status(401).json({ error: 'User not found' })
 
     req.user = user
     next()
@@ -23,6 +17,4 @@ const userAuth = async (req, res, next) => {
   }
 }
 
-module.exports = {
-  userAuth,
-}
+module.exports = { userAuth }

@@ -1,23 +1,22 @@
-require('dotenv').config() // ✅ Load env variables first
+require('dotenv').config();
 const express = require('express')
 const connectDB = require('./config/database')
 const cookieParser = require('cookie-parser')
 
 const app = express()
 
-// ✅ Middleware
+// Middleware
 app.use(express.json())
 app.use(cookieParser())
 
-
-
-const authRouter = require("./routes/auth");
+// Routers
+const authRouter = require('./routes/auth')
 const profileRouter = require('./routes/profile')
 const requestRouter = require('./routes/request')
 
-app.use("/", authRouter);
-app.use("/", profileRouter);
-app.use("/", requestRouter);
+app.use('/', authRouter)
+app.use('/', profileRouter)
+app.use('/', requestRouter)
 
 // Connect to DB and start server
 connectDB()

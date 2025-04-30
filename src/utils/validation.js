@@ -1,5 +1,3 @@
-// utils/validation.js
-
 const validator = require('validator')
 
 const validateSignUpData = (req) => {
@@ -31,9 +29,12 @@ const validateEditProfileData = (req) => {
     'skills',
   ]
 
-  Object.keys(req.body).every((field) => allowedEditFields.includes(field));
-  return isEditallowed;
+  return Object.keys(req.body).every((field) =>
+    allowedEditFields.includes(field),
+  )
 }
 
-// ✅ Export it
-module.exports = { validateSignUpData }
+module.exports = {
+  validateSignUpData,
+  validateEditProfileData,
+}
