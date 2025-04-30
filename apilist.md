@@ -8,7 +8,7 @@ POST/logout
 # profileRouter
 PATCH/profile/view
 GET/profile/edit
-PATCH/profile/password
+PATCH/profile/password// forgot password api
 
 
 #  connectionRequestRouter
