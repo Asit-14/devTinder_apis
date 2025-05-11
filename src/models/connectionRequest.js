@@ -14,7 +14,7 @@ const connectionRequestSchema = new mongoose.Schema(
       type: String,
       required: true, // fixed typo
       enum: {
-        values: ['pending', 'accepted', 'rejected', 'ignored', 'interested'],
+        values: ['accepted', 'rejected', 'ignored', 'interested'],
         message: '{VALUE} is not a valid status type',
       },
     },
@@ -23,6 +23,12 @@ const connectionRequestSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+
+connectionRequestSchema.index({
+  fromUserId: 1,
+  toUserId :1
+});
 
 connectionRequestSchema.pre('save', function (next) {
   if (this.fromUserId.equals(this.toUserId)) {

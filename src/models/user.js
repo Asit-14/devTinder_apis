@@ -68,6 +68,8 @@ const userSchema = new mongoose.Schema(
   },
 )
 
+userSchema.index({ firstName: 1, lastName: 1 });
+
 // Instance method to generate JWT
 userSchema.methods.getJWT = function () {
   return jwt.sign({ _id: this._id }, process.env.JWT_SECRET || 'techasiti', {

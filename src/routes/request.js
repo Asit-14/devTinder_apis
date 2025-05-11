@@ -16,7 +16,6 @@ requestRouter.post(
 
       // Validate status
       const allowedStatus = [
-        'pending',
         'accepted',
         'rejected',
         'ignored',
