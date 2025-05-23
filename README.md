@@ -17,4 +17,4 @@
 - push all  code  on  remote  origin 
 - play with routes  and  extention ex .  /hello , /, hello/2
 - Order  of the route  metter  of a  lot
--   
+- added the patch api
