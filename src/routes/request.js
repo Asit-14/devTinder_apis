@@ -65,7 +65,7 @@ requestRouter.post(
   },
 )
 
-// POST: Review connection request (accept or reject)
+// ✅ POST: Review connection request (accept or reject)
 requestRouter.post(
   '/request/review/:status/:requestId',
   userAuth,
@@ -73,35 +73,42 @@ requestRouter.post(
     try {
       const loggedInUser = req.user
       const { status, requestId } = req.params
-      const allowedStatus = ['accepted', 'rejected']
 
+      const allowedStatus = ['accepted', 'rejected']
       if (!allowedStatus.includes(status)) {
-        return res.status(400).json({ message: 'Status not allowed' })
+        return res.status(400).json({ message: 'Status not valid' })
       }
 
+      // console.log('LoggedInUser ID:', loggedInUser._id)
+      // console.log('Reviewing requestId:', requestId, 'with status:', status)
+
+      // ✅ Use the correct model name
       const connectionRequest = await ConnectionRequestModel.findOne({
         _id: requestId,
         toUserId: loggedInUser._id,
         status: 'interested',
       })
-      
 
       if (!connectionRequest) {
-        return res.status(404).json({ message: 'Connection request not found' })
+        return res.status(404).json({
+          message: 'Connection Request not found',
+          hint: 'Check if requestId and toUserId match and status is "interested"',
+        })
       }
 
       connectionRequest.status = status
       const data = await connectionRequest.save()
 
       res.json({
-        message: 'Connection request ' + status,
+        message: `Connection request ${status}`,
         data,
       })
     } catch (err) {
-      res.status(400).send('ERROR: ' + err.message)
-
+      console.error('Error in review route:', err.message)
+      res.status(500).json({ message: 'ERROR: ' + err.message })
     }
   },
 )
+
 
 module.exports = requestRouter
