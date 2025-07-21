@@ -1,20 +1,33 @@
-# devTinder
+# 💘 Tinder Clone API (Single File Version)
 
-- Create a  repository
-- Initialize  the  repo
--  node_modules package.json ,  package-lock.json
-- Install express
-- Create a server
-- Listen  to port 7777
-- Write  request  handler for  /test ,/ hello
-- Install  nodemon  and updatw  script  inside  package.json
-- What are Dependencies 
-- What  is  the  use  of  "-g" while  npm  install
-- Diffrence  between  caret and  tilde (^ vs ~)
-- Initialize  git 
-- gitignore 
-- CCreate  a  remote  repo on github
-- push all  code  on  remote  origin 
-- play with routes  and  extention ex .  /hello , /, hello/2
-- Order  of the route  metter  of a  lot
-- added the patch api
+This is a simple Tinder-style REST API built using **Node.js**, **Express**, and **MongoDB**. It simulates basic features like user registration, login, swiping, and matchmaking — all in one file (`server.js`) for easy setup and understanding.
+
+---
+
+## 🚀 Features
+
+- 🔐 **User Authentication**
+  - JWT-based signup and login
+  - Password hashing with Bcrypt
+
+- 👤 **User Profile**
+  - Store age, gender, bio, interests
+
+- 👉 **Swipe Logic**
+  - Like or dislike other users
+  - Automatically match on mutual likes
+
+- 💘 **Match List**
+  - View all users you've matched with
+
+---
+
+## 🛠 Tech Stack
+
+- **Node.js**
+- **Express.js**
+- **MongoDB (via Mongoose)**
+- **JWT & Bcrypt**
+- **dotenv**
+
+
